@@ -1,0 +1,193 @@
+<apex:page standardController="intframework__Integration_API_Configuration__c" extensions="JSONController" lightningStylesheets="true"> 
+<script src="https://use.fontawesome.com/fbfc15d1d5.js"></script>
+<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"/>
+<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"/>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />   
+ 
+<apex:sectionHeader title="INTEGRATION API CONFIGURATION" />
+    <apex:form id="ok">
+   
+        <div id ="button" >
+
+            <button name ="sticky" type="button" onclick="save()" >save </button>  
+
+        </div>
+
+
+        <apex:pageBlock id="tested">
+           <apex:pageblockSection id="success">
+               <apex:actionFunction action="{!showPopup}" name="renderpopup"  />
+               <apex:actionFunction action="{!showPopup1}" name="renderpopup1"   />    
+               <apex:actionFunction name="close" action="{!closePopup}" />    
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Adapter_Class_Name__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.Name}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Additional_Header_Parameters__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__API_Endpoint__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__API_Named_Credential__c}"/>
+        
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Data_Format_Config_Set__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Execution_Priority__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Generate_File__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__HTTP_Content_Type__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__HTTP_Method__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Integration_API_Type__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Integration_Configuration__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Integration_Family__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Integration_Provider__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.LastModifiedById}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Long_Running_Operation__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Number_Of_Retries__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Request_Timeout__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Retry_On_Failure__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Send_File__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__UI_Page_Name__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__UI_Page_Type__c}"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Use_Response_Mocker__c}"/>
+                     
+                 
+               
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Request_Mapping__c}" id="requestMapping" onClick="renderpopup()" style="width:150px; height:50px"/>
+                     
+                     
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Response_Mapping__c}" id="responseMapping" onClick="renderpopup1()" style="width:150px; height:50px"/>
+                   
+          </apex:pageblockSection>
+                
+          <apex:pageblockButtons >
+          
+              <apex:commandButton value="save" action="{!save}"/>
+                  
+          </apex:pageblockButtons>
+                     
+        <apex:outputPanel id="tstpopup" rendered="{!displayPopUp}">
+           
+            <apex:outputPanel styleClass="custPopup" layout="block" rendered="{!displayPopUp}">
+            <apex:commandButton value="Submit & Close" onClick="insert(); return false;"  rerender="tstpopup"  />
+            <apex:commandButton value="Cancel" action="{!closePopup}"/>
+                   
+                   
+                <c:JsonEditor typeOfEditor="Integration_Framework"></c:JsonEditor>
+                      
+                      
+        
+ 		    </apex:outputPanel>
+         </apex:outputPanel>
+           
+
+</apex:pageBlock>
+</apex:form>
+               
+ 
+     
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript">
+                    function insert()
+                    {
+                       sforce.connection.sessionId = "{!$Api.Session_ID}";
+                          
+                       var value=editor.getValue();
+                       if({!flag}){
+                           $( "[id*='requestMapping']" ).val(value);
+                       }
+                        else{
+                        $( "[id*='responseMapping']" ).val(value);
+                        }
+                        close();
+ 
+                     }  
+    </script>
+
+     <script>
+        
+     if({!flag}){ 
+     var prevvalue =document.getElementById("{!$Component.ok.tested.success.requestMapping}").value;
+    editor.setValue(prevvalue);      
+    }
+    else{
+         var prevvalue =document.getElementById("{!$Component.ok.tested.success.responseMapping}").value;
+    editor.setValue(prevvalue);
+    }
+    
+   </script>
+   
+
+   
+                     
+
+   
+                
+     
+    
+<style type="text/css">
+
+    #div {
+        resize: both;
+        overflow: auto;
+    }
+    
+    #button{
+        position: sticky;
+        top: 0;
+        padding: 10px;
+        font-size: 20px;
+    }
+
+    .ellipsis{
+
+        width:25px;
+        height:30px;
+       padding:0px;
+        top:-10%;
+        left:-40%;
+        font-size:10px;
+    }
+
+    .custPopup{
+
+        background-color: white;
+        border-width: 1px;
+        border-style: solid;
+        left: 50%;
+        padding:5px;
+        position: absolute;
+            /* These are the 3 css properties you will need to change so the popup
+            displays in the center of the screen. First set the width. Then set
+            margin-left to negative half of what the width is. You can add
+            the height property for a fixed size pop up if you want.*/
+        width: 530px;
+        height:460px;
+        margin-left: -250px;
+        z-index:9999;
+        top:100px;
+        resize: both;
+        overflow: auto;
+
+    }
+    
+    .popupBackground{
+    
+        background-color:white;
+        opacity: 0.20;
+        filter: alpha(opacity = 20);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index:9998;
+        top: 0;
+        left: 0;
+        resize: both;
+        overflow: auto;
+
+    }
+
+ 
+
+    </style> 
+ 
+
+               
+
+   
+
+   
+</apex:page>

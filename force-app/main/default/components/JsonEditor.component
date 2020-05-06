@@ -1,0 +1,203 @@
+<apex:component controller="JSONController">
+<apex:attribute name="typeOfEditor" description="This is the value for the component." type="String" required="true"/>
+<c:AutoSuggestion ></c:AutoSuggestion>    
+    
+    <div id="jsonEditor">
+    </div>
+    
+<apex:includeScript value="{!URLFOR($Resource.SnippetResource)}"/>
+<script src="https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"></script>
+<script src="https://ajaxorg.github.io/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
+<script src="/soap/ajax/15.0/connection.js" type="text/javascript"></script>
+<script src="/soap/ajax/15.0/apex.js" type="text/javascript"></script>
+
+    <html lang="en">
+        
+   
+<style type="text/css" media="screen">
+ 
+  #jsonEditor {
+     display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+</style>
+
+<body>
+    
+
+<script>
+    function strip(str) {
+    return str.replace(/^\s+|\s+$/g, '');
+      }
+    var snippetText="";
+    var objectList=[];
+    switch("{!typeOfEditor}"){
+        case "Integration_Framework":
+            snippetText=getSnippetsIntegration();
+            var snippetManager = ace.require("ace/snippets").snippetManager;
+            var snippets = snippetManager.parseSnippetFile(snippetText,"json");
+            snippetManager.register(snippets,"json");
+            objectList ='{!listOfObjects}'.substring(1,'{!listOfObjects}'.length-2).split(", ");
+    		var objectToFileds = new Map();
+    
+             break;
+        case "Portal":
+            snippetText=getSnippetsPortal();
+           
+            var snippetManager = ace.require("ace/snippets").snippetManager;
+            var snippets = snippetManager.parseSnippetFile(snippetText,"json");
+            snippetManager.register(snippets,"json");
+            break;
+    }      
+    var quoteOver=false;
+  
+
+ 
+    /* accesing salesforce objects from the object controller 'JSONController.apxc for  Integration Framework (Ignore for Portal) */
+    
+    
+    var langTools = ace.require("ace/ext/language_tools");
+   langTools.setCompleters([langTools.snippetCompleter, langTools.keyWordCompleter])
+  
+     var editor = ace.edit("jsonEditor");
+  editor.setTheme("ace/theme/TextMate");
+    //   editor.session.setMode("ace/mode/json");
+    var myCompleter = {
+    identifierRegexps: [/[a-zA-Z0-9]+/],
+    getCompletions: function(editor, session, pos, prefix, callback) {
+        var editorContent = editor.session.getValue();
+        var listOfLines = editorContent.split('\n');
+        var currentLine = listOfLines[pos.row];
+        currentLine=currentLine.substring(0,pos.column);
+        var strippedLine=strip(currentLine);
+       var wordList =getKeywords();
+        
+        if(strippedLine.indexOf(":")!=-1){
+            quoteOver=true;
+            alert("quote detected");
+        }
+        else{
+            quoteOver=false;
+        }
+       
+
+ 
+
+    
+switch("{!typeOfEditor}"){
+        /* Skip to line 164 for portal case */
+        case "Integration_Framework":
+        if(quoteOver&&(currentLine.charAt(pos.column-2)=="\"")){
+            alert(currentLine+"inloop");
+            var myList=currentLine.split(',');
+            var required=myList[myList.length-1];
+            required=required.substring(0,required.lastIndexOf(":"));
+            required=required.substring(required.lastIndexOf("{")+1,required.length);
+            required=strip(required);
+            required=strip(required.substring(1,required.length-1));
+            
+            var listOfValues=getRequiredValueIntegration(required);
+            if(listOfValues!=null)
+            callback(null,listOfValues.map(entry=>{return{value: entry,score:1000,meta:"SUGGESTED VALUE"};}));
+            else
+                {
+            
+                   
+                callback(null,objectList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry,score:0};}));
+            
+            }
+        }
+        else{
+            var required=currentLine.substring(currentLine.lastIndexOf("\"")+1,currentLine.length);
+            var requiredList=required.split('\.');
+            if(requiredList.length==1){
+                callback(null,objectList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry};}));
+            }
+            else{
+                var objectName=requiredList[requiredList.length-2].toLowerCase();
+                if(objectList.includes(objectName)){
+                    if(!objectToFileds.has(objectName)){
+                        sforce.connection.sessionId = '{!$Api.Session_ID}';
+                        var fieldList=sforce.apex.execute("JSONController","sample",{objectName:objectName});
+                        fieldList=fieldList.join(",");
+                        fieldList=fieldList.split(",");
+                        objectToFileds.set(objectName,fieldList);
+                    }
+                    else{
+                       fieldList = objectToFileds.get(objectName);
+                    }
+                    callback(null,fieldList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry};}));
+               }
+            }
+        }
+        break;
+       
+    case "Portal":
+        // adding right side autocomplete i.e after the ':' 
+        if(quoteOver&&currentLine.charAt(pos.column-2)=="\""){
+            alert(currentLine+"inloop");
+            var myList=currentLine.split(',');
+            var required=myList[myList.length-1];
+            required=required.substring(0,required.lastIndexOf(":"));
+            required=required.substring(required.lastIndexOf("{")+1,required.length);
+            required=strip(required);
+            required=required.substring(1,required.length-1);
+            var listOfValues=getRequiredValuePortal(required);
+            
+            callback(null,listOfValues.map(entry=>{return{value: entry,score:1000,meta:"SUGGESTED VALUE"};}));
+               
+        }
+        else{
+            // adding keywords 
+              callback(null,wordList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry};}));
+           
+
+            }
+        
+		break;
+
+        }
+    }
+    }
+   
+   langTools.addCompleter(myCompleter);
+    
+    
+    var editorName = "{!typeOfEditor}";        
+        sforce.connection.sessionId = '{!$Api.Session_ID}';
+        var listd=sforce.apex.execute("JSONController","getKeyword",{editorName:editorName});
+           for(var i=0;i<listd.length;i++){
+            objectList.push(listd[i]);
+        }
+    // var editor = ace.edit("jsonEditor");
+        editor.session.setMode('ace/mode/json', function() {
+        var rules = editor.session.$mode.$highlightRules.getRules();
+        for (var stateName in rules) {
+            if (Object.prototype.hasOwnProperty.call(rules, stateName)) {
+                for(var i in listd){
+                    rules[stateName].unshift({
+                    token: 'keyword',
+                    regex: listd[i]
+                    });
+                }
+            }
+        }
+        editor.session.$mode.$tokenizer = null;
+        editor.session.bgTokenizer.setTokenizer(editor.session.$mode.getTokenizer());
+        editor.session.bgTokenizer.start(0);
+        });
+     
+     editor.setOptions({
+   enableBasicAutocompletion: true,
+    enableLiveAutocompletion: true,
+    enableSnippets: true,
+    autoScrollEditorIntoView: true,
+      });
+       
+ </script>
+        </body>
+    </html>
+</apex:component>

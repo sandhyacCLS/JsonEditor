@@ -1,0 +1,36 @@
+<apex:component >
+    <script>
+        var keyToValueIntegration=new Map();
+        var keyToValuePortal = new Map();
+        keyToValuePortal.set("actionType",["normal", "save", "submit","upload","context"]);
+        keyToValuePortal.set("anchor",["cursor", "left", "right", "top", "bottom"]);
+        keyToValuePortal.set("direction",["left", "right", "top", "bottom"]);
+        keyToValuePortal.set("style",["primary", "secondary", "text", "normal","warning","iconic"]);
+        keyToValuePortal.set("position", ["top-left", "top-right", "bottom-left","bottom-right", "left"]);  
+    	keyToValuePortal.set("render", ["true", "false", "render"]);
+    	keyToValuePortal.set("enable", ["true", "false", "enable"]);
+    	keyToValuePortal.set("uploadMultiple",["true","false"]);
+    
+    	keyToValueIntegration.set("dmlOperation",["Insert","Update"]);
+    	keyToValueIntegration.set("storeInDB",["True","False"]);
+    	keyToValueIntegration.set("publishAsJson",["True","False"]);
+    
+        function getRequiredValuePortal(key){
+            if(keyToValuePortal.has(key)){
+                
+                    return keyToValuePortal.get(key);
+            }
+            else{
+                return null;
+            }
+        }
+        function getRequiredValueIntegration(key){
+            if(keyToValueIntegration.has(key)){
+                    return keyToValueIntegration.get(key);
+            }
+            else{
+                return null;
+            }
+        }
+    </script>
+</apex:component>
