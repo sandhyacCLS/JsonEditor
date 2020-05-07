@@ -77,7 +77,7 @@
         
         if(strippedLine.indexOf(":")!=-1){
             quoteOver=true;
-            alert("quote detected");
+           // alert("quote detected");
         }
         else{
             quoteOver=false;
@@ -91,7 +91,7 @@ switch("{!typeOfEditor}"){
         /* Skip to line 164 for portal case */
         case "Integration_Framework":
         if(quoteOver&&(currentLine.charAt(pos.column-2)=="\"")){
-            alert(currentLine+"inloop");
+           // alert(currentLine+"inloop");
             var myList=currentLine.split(',');
             var required=myList[myList.length-1];
             required=required.substring(0,required.lastIndexOf(":"));
@@ -138,7 +138,7 @@ switch("{!typeOfEditor}"){
     case "Portal":
         // adding right side autocomplete i.e after the ':' 
         if(quoteOver&&currentLine.charAt(pos.column-2)=="\""){
-            alert(currentLine+"inloop");
+           // alert(currentLine+"inloop");
             var myList=currentLine.split(',');
             var required=myList[myList.length-1];
             required=required.substring(0,required.lastIndexOf(":"));

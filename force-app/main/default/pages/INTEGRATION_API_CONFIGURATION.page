@@ -166,7 +166,7 @@
     }
     
     .popupBackground{
-            background-color:black;
+            background-color:grey;
             opacity: 0.20;
             filter: alpha(opacity = 20);
             position: absolute;
