@@ -39,11 +39,20 @@ function getSnippetsPortal() {
         return keyList;   
     }
     function getSnippetsIntegration(){
-        var snippetText ="snippet objectAPI \n\t \"objectAPI\":${1} \n\t\
-    \"objectAlias\":${2},\n\t\
-    \"fields\": [] \n\
-    snippet field \n\t\ \"externalField\": \"${1}\",\n\t\
-    \"fieldAPI\" :\"${2}\" \n\
-    ";
+        var snippetText ="snippet objectAPI \n\t \"objectAPI\":\"${1}\", \n\t\
+        \"objectAlias\":\"${2}\",\n\t\
+        \"fields\": [${3}] \n\
+        snippet field \n\t  \{\"externalField\":\"${1}\",\n\t\
+        \"fieldAPI\" :\"${2}\" \n\t\
+        }\n\
+        snippet StorageConfiguration \n\t \"StorageConfiguration\": {\n\t\
+        \"storeInDB\": \"${1:True}\",\n\t\
+        \"publishAsJson\": \"${2:True}\"\n\t\
+        }\n\
+        snippet DMLOperations \n\t \"DMLOperations\": [{\n\t\
+        \"dmlOperation\":\"${1:Insert}\",\n\t\
+        \"objectMappings\":[{${2:objectAPI}}]\n\t\
+        \}]\n\
+        ";
         return snippetText;;
     }
