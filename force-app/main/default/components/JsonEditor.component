@@ -103,7 +103,7 @@ switch("{!typeOfEditor}"){
             //alert(required+" :inloop");
             if(required=="objectAPI")
             {
-                flag1=true;
+                
                 //alert("objectAPI found at :"+pos.row);
                 objectAPIpos=pos.row;
                     
