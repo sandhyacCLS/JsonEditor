@@ -42,7 +42,8 @@
             snippetManager.register(snippets,"json");
             objectList ='{!listOfObjects}'.substring(1,'{!listOfObjects}'.length-2).split(", ");
     		var objectToFileds = new Map();
-    
+            var objectAPIpos=0;
+ 
              break;
         case "Portal":
             snippetText=getSnippetsPortal();
@@ -90,47 +91,83 @@
 switch("{!typeOfEditor}"){
         /* Skip to line 164 for portal case */
         case "Integration_Framework":
-        if(quoteOver&&(currentLine.charAt(pos.column-2)=="\"")){
-           // alert(currentLine+"inloop");
+        if(quoteOver&&(currentLine.charAt(pos.column-2)=="\"") ){
+            
+           
             var myList=currentLine.split(',');
             var required=myList[myList.length-1];
             required=required.substring(0,required.lastIndexOf(":"));
             required=required.substring(required.lastIndexOf("{")+1,required.length);
             required=strip(required);
             required=strip(required.substring(1,required.length-1));
-            
+            //alert(required+" :inloop");
+            if(required=="objectAPI")
+            {
+                flag1=true;
+                //alert("objectAPI found at :"+pos.row);
+                objectAPIpos=pos.row;
+                    
+            }    
             var listOfValues=getRequiredValueIntegration(required);
             if(listOfValues!=null)
-            callback(null,listOfValues.map(entry=>{return{value: entry,score:1000,meta:"SUGGESTED VALUE"};}));
-            else
+            	callback(null,listOfValues.map(entry=>{return{value: entry,score:1000,meta:"SUGGESTED VALUE"};}));
+            else if(required=="fieldAPI")
+            {
+                    
+                var obj=listOfLines[objectAPIpos].substring(listOfLines[objectAPIpos].lastIndexOf(":"),listOfLines[objectAPIpos].length);
+                obj=strip(obj.substring(obj.indexOf("\"")+1,obj.length-3));
+                var objectName=obj.toLowerCase();
+                if(objectList.includes(objectName))
                 {
-            
-                   
-                callback(null,objectList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry,score:0};}));
-            
+                    if(!objectToFileds.has(objectName))
+                    {
+                       	sforce.connection.sessionId = '{!$Api.Session_ID}';
+                       	var fieldList=sforce.apex.execute("JSONController","sample",{objectName:objectName});
+                      	fieldList=fieldList.join(",");
+                        fieldList=fieldList.split(",");
+                        objectToFileds.set(objectName,fieldList);
+                    }
+                    else
+                    {
+                        fieldList = objectToFileds.get(objectName);
+                    }
+                    
+                    callback(null,fieldList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry};}));
+                }
+            }            
+            else // after quote if it isnt there in right side autocomplete or not fieldAPI
+            {
+            callback(null,objectList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry,score:0};}));
             }
+            
         }
-        else{
+        else
+        { 
             var required=currentLine.substring(currentLine.lastIndexOf("\"")+1,currentLine.length);
             var requiredList=required.split('\.');
-            if(requiredList.length==1){
+            if(requiredList.length==1) // if dot operator not found
+            {
                 callback(null,objectList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry};}));
-            }
-            else{
+            }    
+            else
+            {        // if dot operator found
                 var objectName=requiredList[requiredList.length-2].toLowerCase();
-                if(objectList.includes(objectName)){
-                    if(!objectToFileds.has(objectName)){
+                if(objectList.includes(objectName))
+                {
+                    if(!objectToFileds.has(objectName))
+                    {
                         sforce.connection.sessionId = '{!$Api.Session_ID}';
                         var fieldList=sforce.apex.execute("JSONController","sample",{objectName:objectName});
                         fieldList=fieldList.join(",");
                         fieldList=fieldList.split(",");
                         objectToFileds.set(objectName,fieldList);
                     }
-                    else{
+                    else
+                    {
                        fieldList = objectToFileds.get(objectName);
                     }
                     callback(null,fieldList.filter(entry=>{return entry.startsWith(prefix.toLowerCase());}).map(entry=>{return{value: entry};}));
-               }
+                }
             }
         }
         break;
