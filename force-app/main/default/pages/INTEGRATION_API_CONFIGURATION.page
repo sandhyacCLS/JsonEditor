@@ -43,10 +43,10 @@
                      
                  
                
-               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Request_Mapping__c}" id="requestMapping" onClick="renderpopup()" style="width:150px; height:50px"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Request_Mapping__c}" id="requestMapping" onClick="renderpopup()" style="width:150px; height:450px"/>
                      
                      
-               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Response_Mapping__c}" id="responseMapping" onClick="renderpopup1()" style="width:150px; height:50px"/>
+               <apex:inputField value="{!intframework__Integration_API_Configuration__c.intframework__Response_Mapping__c}" id="responseMapping" onClick="renderpopup1()" style="width:150px; height:450px"/>
                    
           </apex:pageblockSection>
                 
