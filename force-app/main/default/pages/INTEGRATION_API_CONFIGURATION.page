@@ -80,27 +80,36 @@
   <script src="https://use.fontawesome.com/fbfc15d1d5.js"></script>
   
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script type="text/javascript">
-                    function insert()
-                    {
-                       sforce.connection.sessionId = "{!$Api.Session_ID}";
-                          
-                       var value=editor.getValue();
-                       if({!flag}){
-                           $( "[id*='requestMapping']" ).val(value);
-                       }
-                        else{
+  <script type="text/javascript">
+  var check =false;
+                  function insert()
+                  {
+                      
+                      //   sforce.connection.sessionId = "{!$Api.Session_ID}";
+                    if(check)
+                        var value=editor.getValue();
+                    else
+                        var value=JSON.stringify(JSON.parse(editor.getValue()), null,2);
+                      
+                     if({!flag}){
+                    
+                        $( "[id*='requestMapping']" ).val(value);
+                     }
+                    else{
                         $( "[id*='responseMapping']" ).val(value);
-                        }
-                        close();
- 
-                     } 
-                     function beautifybtn()
-    			    {
-                    //var editor = ace.edit("jsonEditor");
-       				    editor.setValue(JSON.stringify(JSON.parse(editor.getValue()), null,"\t"));
-        		    } 
-    </script>
+                    }
+                    close();
+                      
+
+                   }  
+  
+              function beautifybtn()
+              {
+                  check=true;
+                  //var editor = ace.edit("jsonEditor");
+                     editor.setValue(JSON.stringify(JSON.parse(editor.getValue()), null,2));
+              }
+  </script>
 
      <script>
         
